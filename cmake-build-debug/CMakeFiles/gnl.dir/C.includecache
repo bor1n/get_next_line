@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/avarys/CLionProjects/gnl/get_next_line.c
+get_next_line.h
+/Users/avarys/CLionProjects/gnl/get_next_line.h
+
+/Users/avarys/CLionProjects/gnl/get_next_line.h
+unistd.h
+-
+stdlib.h
+-
+fcntl.h
+-
+
