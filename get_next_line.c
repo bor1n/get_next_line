@@ -1,61 +1,69 @@
 #include "get_next_line.h"
 
-int    process(char **line, char **buffer)
+char	*end_of_file(char **line)
 {
-    char *temp;
-
-    temp = *line;
-    while (*temp)
-        temp++;
-    while(**buffer)
-    {
-        if (**buffer == -1)
-            return (-1);
-        (*temp) = **buffer;
-        (*buffer)++;
-        if (*temp == '\n')
-            return (1);
-        temp++;
-    }
-    return (0);
+	if (**line == 0)
+		return (0);
+	return (*line);
 }
 
-int get_next_line(int fd, char **line)
+void	move(char *buffer, int index)
 {
-    static char *buffer;
-    int size;
-    static char *temp;
-    int result;
+	int	i;
 
-    if (fd < 0 || !line || BUFFER_SIZE <= 0)
-        return (-1);
-    ft_memset(*line, 0, ft_strlen(*line));
-    if (buffer != 0)
-    {
-        result = process(line, &buffer);
-        if (result == 1)
-            return (1);
-        if (result == -1)
-            return (-1);
-    }
-    if (buffer == 0)
-        buffer = malloc(BUFFER_SIZE + 1);
-    if (temp == 0)
-        temp = buffer;
-    if (buffer == 0)
-        return (-1);
-    while(1)
-    {
-        buffer = temp;
-        ft_memset(buffer, 0, BUFFER_SIZE);
-        size = read(fd, buffer, BUFFER_SIZE);
-        buffer[BUFFER_SIZE] = 0;
-        if (size == 0)
-            return (0);
-        result = process(line, &buffer);
-        if (result == -1)
-            return (0);
-        if (result == 1)
-            return (1);
-    }
+	i = 0;
+	while (buffer[index])
+		buffer[i++] = buffer[index++];
+	buffer[i] = buffer[index];
+}
+
+void	from_buffer(char *buffer, char **line)
+{
+	int	newline;
+
+	newline = find(buffer, '\n');
+	buffer[newline++] = 0;
+	*line = ft_strjoin(*line, buffer);
+	move(buffer, newline);
+}
+
+int	check_buffer_plz(char *buffer, char **line)
+{
+	if (((int)find(buffer, '\n')) != -1)
+	{
+		from_buffer(buffer, line);
+		return (1);
+	}
+	*line = ft_strjoin(*line, buffer);
+	return (0);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	buffer[BUFFER_SIZE + 1];
+	int			size;
+	char		*line;
+
+	if (fd < 0 || fd > 255 || BUFFER_SIZE <= 0)
+		return (NULL);
+	line = 0;
+	if (check_buffer_plz(buffer, &line))
+		return (line);
+	while (1)
+	{
+		ft_memset(buffer, 0, BUFFER_SIZE);
+		size = read(fd, buffer, BUFFER_SIZE);
+		if (size < 0)
+			return (NULL);
+		if (size == 0)
+			return (end_of_file(&line));
+		buffer[size] = 0;
+		if (((int)find(buffer, '\n')) != -1)
+		{
+			from_buffer(buffer, &line);
+			return (line);
+		}
+		else
+			line = ft_strjoin(line, buffer);
+	}
 }
